@@ -545,8 +545,8 @@ my_date3
 ```
 41. Importa el valor numérico `25081985`, sabiendo que el formato es dia, mes, año, y posteriormente `192012` donde se ha almacenado año, mes y día. Modifica el campo fecha en el segundo caso añadiendo algún carácter separador para eliminar la ambigüedad.
 ```{r}
-fecha<-'19200102'
-ymd(fecha)
+date1 <- dmy("25081985")
+date1
 
 
 
@@ -555,18 +555,22 @@ ymd(fecha)
 42. Almacena la cadena `2014-08-23 17:23:02` en la variable `dt1`  e impórtala para que incluya la fecha y la hora,posteriormente importa la cadena `"03:22:14"` (hh:mm:ss)
 ```{r}
 
+dt1 <- "2014-08-23 17:23:02"
+dt1_converted <- ymd_hms(dt1)
 
-
+dt1_converted
 
 ```
 43. Importa el vector de fechas almacenado el `dt2`
 ```{r}
-
+dt2_converted <- ymd(dt2)
+dt2_converted
 ```
 44. Podemos reasingar nuevos valores a una variable fecha/hora con la función `update`
 , por ejemplo: `update(this_moment, hours = 8, minutes = 34, seconds = 55)`. Actualiza la variable `this_moment` creada anteriormente para que contenga la hora actual.
 ```{r}
-
+this_moment_updated <- update(this_moment, hours = hour(now()),  minutes = minute(now()), seconds = second(now()))
+this_moment_updated
 ```
 45. __Zonas horarias__. Considera que estás en Nueva York, que planeas visitar a un amigo en Hong Kong y que has perdido tu itinerario, pero sabes que tu vuelo sale de Nueva York a las 17:34 (17:34 horas) pasado mañana. También sabes que el vuelo está programado para llegar a Hong Kong exactamente 15 horas y 50 minutos después de la salida. Vamos a reconstruir el itinerario:
   + Genera la fecha actual, con `now` e indica la zona horaria de Nueva York(America/New_York) (la función `OlsonNames()` devuelve todas las zonas horarias) y almacénala en la variable `nyc`.
@@ -579,12 +583,24 @@ ymd(fecha)
   
 ```{r}
 
+nyc <- now(tz = "America/New_York")
+nyc
+salida <- nyc + days(2)
+salida
 
+salida <- update(salida, hours = 17, minutes = 34)
+salida
 
+llegada_nyc <- salida + hours(15) + minutes(50)
+llegada_nyc
 
+llegada_hk <- with_tz(llegada_nyc, tzone = "Asia/Hong_Kong")
+llegada_hk
 
-
-
+singapur <- ymd("2008-06-17", tz = "Asia/Singapore")
+intervalo <- interval(singapur, nyc)
+periodo <- as.period(intervalo)
+periodo
 
 
 ```
