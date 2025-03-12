@@ -442,9 +442,15 @@ gradebook
 ```
 34. Consideremos el caso de una observación almacenada en varias tablas. Observa los datos almacenados en `failed` y `passed` con la información de los alumnos que suspeden (calificaciones C,D,E,F) y los que aprueban (calificaciones A, B). Debes unir ambos conjuntos en uno que contenga una columna adicional llamada `status` que indicará `passed` o `failed` según la situación de cada alumno, puedes usar la función `bind_rows`.
 ```{r}
+students_status <- bind_rows(
+  failed %>% mutate(status = "failed"), 
+  passed %>% mutate(status = "passed")  
+)
 
 
+students_status
 
+head(sat)
 ```
 # Pongamos todo en común.
 
@@ -452,22 +458,20 @@ gradebook
 Considera los datos almacenado en `sat` y haz las transformaciones adecuadas para que las columnas del conjunto `tidy` sean `score_range, part, sex, count` en ese orden. Ten en cuenta que los datos totales no es necesario almacenarlos ya que se pueden generar a posteriori.
 
 ```{r}
+sat_tidy <- sat %>%gather(key = "sex", value = "count", read_male, read_fem, math_male, math_fem, write_male, write_fem) %>%  mutate(part = case_when(grepl("read", sex) ~ "reading",grepl("math", sex) ~ "math",grepl("write", sex) ~ "writing")) %>%select(score_range, part, sex, count)
 
-
-
-
-
+sat_tidy
 
 ```
 
 36. Utiliza agrupamientos, según las variables `part, sex` y genera dos nuevas columnas que contengan el número total de estudiantes en dicho grupo, y la proporción dentro del grupo. Almacénalas en las variables `total y prop` respectivamente.
 ```{r}
 
+sat_summary <- sat_tidy %>%group_by(part, sex) %>%summarise(total = sum(count), prop = count / total  ) %>%ungroup()
 
 
 
-
-
+sat_summary
 
 
 
