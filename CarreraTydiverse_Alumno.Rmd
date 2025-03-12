@@ -222,19 +222,25 @@ cran3
 ```
 18. Usa `summarise` para determinar el valor medio del tamaño de las descargas realizadas en `cran` y almacenálo en la variable `avg_bytes`
 ```{r}
-
+avg_bytes <- cran %>% summarise(avg_bytes = mean(size, na.rm = TRUE))
+avg_bytes
 ```
 # Agrupamientos
 
 19. Crea un agrupamiento del tibble `cran` según la variable `package` y almacénalo en la variable `by_package`. Observa el nuevo elemento creado y aunque aparentemente no hay cambio al principio, se indica que se ha hecho un agrupamiento. Éste agrupamiento se puede deshacer con la función `ungroup`.
 ```{r}
+by_package <- cran %>% group_by(package)
+by_package
 
+by_package_ungrouped <- by_package %>% ungroup()
+by_package_ungrouped
 
 ```
 
 20. Usa la función `summarise` sobre  el elemento agrupado y calcula  el valor medio de la variable `size`. Observa el efecto del agrupamiento en el resultado.
 ```{r}
-
+avg_size_by_package <- by_package %>% summarise(avg_size = mean(size, na.rm = TRUE))
+avg_size_by_package
 ```
 21. Para el agrupamiento creado calcula: 
 + . count = n()
@@ -247,10 +253,10 @@ elementos distintos,`n_distinct()` de la variables `ip_id y country`, y el
 la mediana (función `stats::median`) de la variable `size` y almacénalos en las variables `count, unique, countries y med_bytes` respectivamente. El resultado del sumario se almacenará en `pack_sum`.
 
 ```{r}
+pack_sum <- by_package %>%summarise(count = n(), unique = n_distinct(ip_id), countries = n_distinct(country), avg_bytes = mean(size, na.rm = TRUE), med_bytes = stats::median(size, na.rm = TRUE))
 
 
-
-
+pack_sum
 
 
 
@@ -277,6 +283,8 @@ la mediana (función `stats::median`) de la variable `size` y almacénalos en la
 22. Muestra el 1% de los paquetes que han sido más descargados. Para ello puedes utilizar la función `quantile(????, probs=0.99)`. Siendo ??? la variable de interés, que te permitirá estimar el umbral. Los valores por encima serán los que nos interesen. Almacena estos paquetes **top descargas** en la variable `top_counts`. **NOTA: De ahora en adelante concatena todas las operaciones partiendo del elemento `cran`, usando _pipes_**.
 ```{r}
 
+top_counts <- cran %>%group_by(package) %>% summarise(count = n()) %>%  filter(count >= quantile(count, probs = 0.99))
+top_counts
 
 
 
@@ -286,8 +294,8 @@ la mediana (función `stats::median`) de la variable `size` y almacénalos en la
 23. Repite el apartado anterior utilizando **pipes** para que finalmente el resultado se ordene, en orden descendente, según el número de descargas (`count`) y se almacene el la variable `top_counts_sorted`
 ```{r}
 
-
-
+top_counts_sorted <- cran %>%group_by(package) %>% summarise(count = n()) %>%  filter(count >= quantile(count, probs = 0.99)) %>% arrange(desc(count))
+top_counts_sorted
 
 
 
@@ -300,9 +308,9 @@ la mediana (función `stats::median`) de la variable `size` y almacénalos en la
 
 ```{r}
 
+top_unique_sorted <- cran %>%group_by(package) %>%summarise(unique = n_distinct(ip_id)) %>%  filter(unique >= quantile(unique, probs = 0.99)) %>% arrange(desc(unique))
 
-
-
+top_unique_sorted
 
 
 
@@ -312,7 +320,7 @@ la mediana (función `stats::median`) de la variable `size` y almacénalos en la
 
 ```{r}
 
-
+cran %>%select(ip_id, country, package, size) %>%print()
 
 ```
 
@@ -320,19 +328,19 @@ la mediana (función `stats::median`) de la variable `size` y almacénalos en la
 
 ```{r}
 
-
+cran %>%select(ip_id, country, package, size) %>%  mutate(size_mb = size / 2^20) %>%print()  
 
 ```
 
 27. Selecciona aquellas descargas cuyo tamaño es menor o igual que 0.5 Mbytes
 ```{r}
-
+cran %>%select(ip_id, country, package, size) %>%  mutate(size_mb = size / 2^20) %>% filter(size_mb <= 0.5) %>%print() 
 
 
 ```
 28. Repite el apartado anterior ordenando los resultados, en orden descendente según el tamaño en Megabytes y muéstralo por pantalla.
 ```{r}
-
+cran %>%select(ip_id, country, package, size) %>%mutate(size_mb = size / 2^20) %>%filter(size_mb <= 0.5) %>%arrange(desc(size_mb)) %>%print()
 
 
 
@@ -341,9 +349,9 @@ la mediana (función `stats::median`) de la variable `size` y almacénalos en la
 `cran%>%...+geom_point()`
 
 ```{r}
+library(ggplot2)
 
-
-
+cran %>%group_by(country) %>%summarise(total_traffic = sum(size)) %>%filter(total_traffic >= quantile(total_traffic, 0.90)) %>%arrange(desc(total_traffic)) %>%ggplot(aes(x = country, y = total_traffic)) +geom_point()
 
 ```
 **EXTRA** Tal como se indica en el ejercicio, el significado de los códigos usados para la codificación de los paise se pueden obtener de https://dev.maxmind.com/geoip/geoip2/geolite2/. Descarga el fichero **GeoLite2 Country** en formato CSV. Este fichero contiene información en varios idiomas. Usa `GeoLite2-Country-Locations-es.csv` que tiene la información en español. Deseamos poder determinar las descargas por continentes por lo que necesitamos añadir esta información a los datos de las descargas almacenados en `cran`. Procede de la siguiente forma:
@@ -356,7 +364,6 @@ la mediana (función `stats::median`) de la variable `size` y almacénalos en la
  + Representa un diagrama de barras con el flujo de datos, por continente, ordenados de mayor a menor. Expresa el flujo de datos en Terabytes (1Tb=2^40bytes)
  
 ```{r}
-
 
 
 
