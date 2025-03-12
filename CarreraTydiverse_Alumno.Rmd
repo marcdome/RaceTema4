@@ -392,44 +392,52 @@ Carga el fichero de datos `datostidyr.Rdata` que contiene varios conjuntos de da
 La columna `grade` es la calificación y las dos siguientes el número de estudiantes hombre y mujer que han recibido dicha calificación.
 ¿ Cuáles son las variables ?. Transfórmalo en un conjunto `tidy` con las variables, `grade, sex y count`
 ```{r}
-
-
-
+load(file ='./data/datostidyr.Rdata')
+students
+students_tidy <- students %>%pivot_longer(cols = c(male, female),names_to = "sex",values_to = "count")
+students_tidy
 ```
 30. Considera el conjunto ´students2´, que es similar al primero pero que se han recogido datos correspondientes a dos grupos, (`male_1, female_1`, etc). Transfórmalo en un conjunto `tidy` añadiendo una columna adicional correspondiente al grupo (llama a la nueva variable `class`)
 ```{r}
+students2
 
-
-
+students2_tidy <- students2 %>%pivot_longer(cols = c(male_1, female_1, male_2, female_2),names_to = c("sex", "class"),names_sep = "_", values_to = "count") 
 
 ```
 31. Considera el conjunto `students3` y observa por qué no es un `tidy data` . Las variables finales del conjunto deberían ser: `name, class, midterm, final`. Dado que un alumno solo puede estar en una de las clases aparecen muchos `NA`, al reorganizar, usa `na.rm=TRUE` en las opciones de `gather`
 ```{r}
 
+students3
 
+students3_tidy <- students3 %>%gather(key = "class", value = "score", -name, na.rm = TRUE) %>%  separate(class, into = c("class", "exam"), sep = "_")
 
-
+students3_tidy
 ```
 32. Considera que la columna `class` queremos especificarla con valores, 1,2,3,4 y 5 en lugar de class1, ..., class5. En librería de importación de datos (`readr`) se proporcionan funciones que permite identificar y extraer diversos tipos de datos. Son las funciones `parse_XXXX`. Observa el efecto de aplicar `parse_number('class5')` y utiliza el resultado para realizar la tarea solicitada.
 
 ```{r}
+library(readr)
+students3_tidy <- students3 %>%gather(key = "class", value = "score", -name, na.rm = TRUE) %>%mutate(class = parse_number(class))
 
-
-
-
-
-
+students3_tidy
+head(students4)
 ```
 33. Observa el conjunto `students4` donde se presenta el problema de tener varias observaciones en la misma tabla. Separa el conjunto en dos tablas, una que contenga información relativa a los estudiantes, que llamarás `student_info`, que no debe contener repeticiones, y otra con las calificaciones y la clave primaria que enlaza ambas tablas(`id`), que llamarás `gradebook`.
 ```{r}
 
+student_info <- students4 %>%
+  select(id, name, sex) %>%   
+  distinct()
+
+gradebook <- students4 %>%
+  select(id, class, midterm, final) %>% 
+  distinct() %>%  
+  mutate(id = row_number())
 
 
 
-
-
-
-
+student_info
+gradebook
 
 ```
 34. Consideremos el caso de una observación almacenada en varias tablas. Observa los datos almacenados en `failed` y `passed` con la información de los alumnos que suspeden (calificaciones C,D,E,F) y los que aprueban (calificaciones A, B). Debes unir ambos conjuntos en uno que contenga una columna adicional llamada `status` que indicará `passed` o `failed` según la situación de cada alumno, puedes usar la función `bind_rows`.
