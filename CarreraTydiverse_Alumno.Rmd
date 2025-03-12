@@ -60,7 +60,8 @@ opts_chunk$set(echo=T,message = F, error = F, warning = F, comment = NA, fig.ali
 
 library(pacman)
 p_load(dplyr,lubridate)
-
+library(tidyr)
+library(dplyr)
 ```
 
 Todos los ejercicios planteados están relacionados con el uso de las librerías **dplyr, tidyr y lubridate**. Familiarízate con el uso del operador **%>%** para facilitar la compresión del código.
@@ -147,11 +148,12 @@ cran %>% select(-date:-size)
 ```
 6. Elige aquellos registros en los que se haya descargado el paquete `plotly`, desde un sistema que ejecuta la versión de R 3.5.1
 ```{r}
-
+cran%>%filter(package == "plotly", version == "3.5.1")
+#No hay ninguno
 ```
 6. Elige aquellas descargas realizadas desde España (ES), con versiones de R superiores a la 3.4.0
 ```{r}
-
+cran%>%filter(country == "ES", as.numeric(version) > 3.4)
 ```
 
 7. Elige aquellas descargas realizadas desde España (ES), o Portugal (PT).
