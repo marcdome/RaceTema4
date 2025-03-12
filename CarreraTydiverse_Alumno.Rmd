@@ -148,7 +148,10 @@ cran %>% select(-date:-size)
 ```
 6. Elige aquellos registros en los que se haya descargado el paquete `plotly`, desde un sistema que ejecuta la versión de R 3.5.1
 ```{r}
-cran%>%filter(package == "plotly", version == "3.5.1")
+cran %>%
+  filter(package == "plotly") %>%
+  select(version) %>%
+  unique()
 #No hay ninguno
 ```
 6. Elige aquellas descargas realizadas desde España (ES), con versiones de R superiores a la 3.4.0
@@ -479,6 +482,7 @@ sat_summary
 37. Representa gráficamente el conjunto obtenido para mostrar las diferencias entre hombres y mujeres, en las diferentes pruebas para cada una de las franjas de calificación.
 ```{r}
 
+ggplot(sat_summary, aes(x = part, y = total, fill = sex, group = sex)) +geom_bar(stat = "identity", position = "dodge")
 
 
 
@@ -497,27 +501,46 @@ sat_summary
 
 38. La función `today` devuelve la fecha actual. Almacéna la fecha actual en `this_day`, y muéstrala por pantalla. Usa las funciones `year, month y day` para extraer cada una de las partes. `wday` para obtener el día de la semana ()
 ```{r}
+library(lubridate)
 
+this_day <- today()
 
+year_part <- year(this_day)   
+month_part <- month(this_day) 
+day_part <- day(this_day)     
+weekday_part <- wday(this_day)
 
-
-
-
-
+year_part
+month_part
+day_part
+weekday_part
 ```
 39. Guarda el instante actual en una variable llamada `this_moment` con la función `now`
 y muéstralo por pantalla. Usa las funciónes `hour, minute, second` para extraer la información de cada elemento.
 ```{r}
+this_moment <- now()
 
+hour_part <- hour(this_moment)
+minute_part <- minute(this_moment)
+second_part <- second(this_moment)
 
-
-
-
+hour_part
+minute_part
+second_part
 ```
 40. La librería `lubridate` dispone de múltiples funciones para importar en formato fecha datos con un gran variedad de formatos de entrada `ymd(), dmy(), hms(), ymd_hms()` donde cada letra indica _years (y),months (m), days (d), hours (h), minutes (m), y seconds (s)_. Prueba my_date <- ymd("2019-02-14"), y determina de que clase es `my_date`. Las funciones son muy robustas y pueden intepretar correctamente diversos formato. Prueba `ymd()` para importar la fecha  __"1989 May 17"__. ¿Cómo importarías __"March 12, 1975"__?
 ```{r}
 
+my_date <- ymd("2019-02-14")
 
+my_date
+class(my_date)
+
+my_date2 <- ymd("1989 May 17")
+my_date2
+
+my_date3 <- mdy("March 12, 1975")
+my_date3
 
 ```
 41. Importa el valor numérico `25081985`, sabiendo que el formato es dia, mes, año, y posteriormente `192012` donde se ha almacenado año, mes y día. Modifica el campo fecha en el segundo caso añadiendo algún carácter separador para eliminar la ambigüedad.
