@@ -94,7 +94,7 @@ Se pueden descargar ficheros actuales del `logs` usando la librería https://r-h
 ```{r,eval=FALSE}
 # Fuente de datos http://cran-logs.rstudio.com/
 mydf <- read_csv("./data/2024-03-12.csv")
-
+e
 set.seed(seed=14032024)
 N<-200000
 I<-sample(1:nrow(mydf),size=N,replace=FALSE)
